@@ -57,106 +57,107 @@ export default function Home() {
   }, [isLoading, userInput]);
 
   return (
-    <div>
-      <Center mx="lg">
-        <Title order={1}>Legacy - Mental Health MVP</Title>
-      </Center>
-      <Center mx="lg">
-        <Container size="sm">
-          <p>
-            Enter an issue you are facing with a patient to get recommendations.
-          </p>
+    <div
+      style={{
+        display: "flex",
+        alignContent: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        height: "100vh",
+      }}
+    >
+      <Container size="sm" mb={24}>
+        <Title order={1} style={{ textAlign: "center" }}>
+          Legacy - Mental Health MVP
+        </Title>
+        <Text style={{ textAlign: "center" }}>
+          Enter an issue you are facing with a patient to get recommendations.
+        </Text>
+      </Container>
+      <Container
+        style={{
+          borderRadius: 12,
+          borderStyle: "solid",
+          borderWidth: 2,
+          borderColor: "#5FA377",
+          boxShadow: "5px 5px 5px rgba(0,0,0,0.1)",
+        }}
+        pt={12}
+        pb={12}
+        mb={24}
+        w={"80%"}
+      >
+        <Container mih={248}>
+          {isLoading ? (
+            <Center>
+              <Loader size="lg" />
+            </Center>
+          ) : modelResponse ? (
+            <Markdown>{modelResponse}</Markdown>
+          ) : (
+            <Center>
+              <Text style={{ opacity: 0.6 }}>
+                Ask me for help with your patients.
+              </Text>
+            </Center>
+          )}
         </Container>
-      </Center>
 
-      <Center>
-        <Container
-          style={{
-            borderRadius: 12,
-            borderStyle: "solid",
-            borderWidth: 2,
-            borderColor: "#5FA377",
-            boxShadow: "5px 5px 5px rgba(0,0,0,0.1)",
-          }}
-          pt={12}
-          pb={12}
-          mb={24}
-          w={"80%"}
-        >
-          <Container mih={248}>
-            {isLoading ? (
-              <Center>
-                <Loader size="lg" />
-              </Center>
-            ) : modelResponse ? (
-              <Markdown>{modelResponse}</Markdown>
-            ) : (
-              <Center>
-                <Text style={{ opacity: 0.6 }}>
-                  Ask me for help with your patients.
-                </Text>
-              </Center>
-            )}
-          </Container>
-
-          <Container>
-            <Grid
-              type="container"
-              breakpoints={{
-                xs: "100px",
-                sm: "200px",
-                md: "400px",
-                lg: "762px",
-                xl: "1000px",
-              }}
+        <Container>
+          <Grid
+            type="container"
+            breakpoints={{
+              xs: "100px",
+              sm: "200px",
+              md: "400px",
+              lg: "762px",
+              xl: "1000px",
+            }}
+          >
+            <Grid.Col>
+              <Textarea
+                placeholder="Enter a challenge you are facing with your patient"
+                value={userInput}
+                disabled={isLoading}
+                onChange={handleTextChange}
+                autosize
+                minRows={2}
+                onKeyUp={(event) => console.log(event.code === "Enter")}
+              />
+            </Grid.Col>
+            <Grid.Col>
+              <Text style={{ textAlign: "end" }}>
+                {userInput.length}/{MAX_CHARS}
+              </Text>
+            </Grid.Col>
+            <Grid.Col
+              span={{ base: 12, md: 6, lg: 2 }}
+              offset={{ base: 0, md: 6, lg: 10 }}
             >
-              <Grid.Col>
-                <Textarea
-                  placeholder="Enter a challenge you are facing with your patient"
-                  value={userInput}
-                  disabled={isLoading}
-                  onChange={handleTextChange}
-                  autosize
-                  minRows={2}
-                  onKeyUp={(event) => console.log(event.code === "Enter")}
-                />
-              </Grid.Col>
-              <Grid.Col>
-                <Text style={{ textAlign: "end" }}>
-                  {userInput.length}/{MAX_CHARS}
-                </Text>
-              </Grid.Col>
-              <Grid.Col
-                span={{ base: 12, md: 6, lg: 2 }}
-                offset={{ base: 0, md: 6, lg: 10 }}
+              <Button
+                fullWidth
+                variant="filled"
+                onClick={handleSubmit}
+                disabled={isSubmitDisabled}
               >
-                <Button
-                  fullWidth
-                  variant="filled"
-                  onClick={handleSubmit}
-                  disabled={isSubmitDisabled}
-                >
-                  Get Help
-                </Button>
-              </Grid.Col>
-            </Grid>
-          </Container>
+                Get Help
+              </Button>
+            </Grid.Col>
+          </Grid>
         </Container>
-      </Center>
-      <Center>
-        <Anchor
-          href="https://github.com/zacharyjarnagin/legacy-mvp"
-          target="_blank"
-        >
-          <Flex justify="center" align="center">
-            <Text>View on</Text>
-            <ThemeIcon variant="white">
-              <IconBrandGithub style={{ width: "70%", height: "70%" }} />
-            </ThemeIcon>
-            <Text>GitHub</Text>
-          </Flex>
-        </Anchor>
-      </Center>
+      </Container>
+      <Anchor
+        href="https://github.com/zacharyjarnagin/legacy-mvp"
+        target="_blank"
+      >
+        <Flex justify="center" align="center">
+          <Text>View on</Text>
+          <ThemeIcon variant="white">
+            <IconBrandGithub style={{ width: "70%", height: "70%" }} />
+          </ThemeIcon>
+          <Text>GitHub</Text>
+        </Flex>
+      </Anchor>
     </div>
   );
 }
