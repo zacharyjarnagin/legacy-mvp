@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  backend
+
+# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  OpenAIApiKeyParameter:
+    Type: String
+    NoEcho: true
+    Description: "API key for OpenAI embeddings"
+  # OpenSearchMasterUserPassword:
+  #   Type: String
+  #   NoEcho: true
+  #   Description: 'Password for OpenSearch master user (fine-grained security)'
+
+Resources:
+
+  GetAdviceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get_advice.lambda_handler
+      Runtime: python3.13
+      Architectures:
+      - x86_64
+      MemorySize: 128
+      Timeout: 60
+      Description: An endpoint to get suggestions from an LLM
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+            TimeoutInMillis: 60000
+        # Intended for Lambda Warm up
+        Options:
+          Type: Api
+          Properties:
+            Path: /
+            Method: OPTIONS
+      Environment:
+        Variables:
+          OPENAI_API_KEY: !Ref OpenAIApiKeyParameter
+          # OPENSEARCH_ENDPOINT: !GetAtt OpenSearchDomain.DomainEndpoint
+          # OPENSEARCH_INDEX: csv-index
+      # Policies:
+      #   - Statement:
+      #     - Effect: Allow
+      #       Action:
+      #         - es:ESHttpGet
+      #       Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AWS::StackName}-domain/*'
+
+    # S3 bucket to upload CSV files
+  # CsvUploadBucket:
+  #   Type: AWS::S3::Bucket
+  #   Properties:
+  #     BucketName: !Sub '${AWS::StackName}-csv-upload'
+
+  # OpenSearchDomain:
+  #   Type: AWS::OpenSearchService::Domain
+  #   Properties:
+  #     DomainName: !Sub '${AWS::StackName}-domain'
+  #     EngineVersion: 'OpenSearch_2.3'
+  #     ClusterConfig:
+  #       InstanceType: t3.small.search
+  #       InstanceCount: 1
+  #     EBSOptions:
+  #       EBSEnabled: true
+  #       VolumeSize: 10
+  #     DomainEndpointOptions:
+  #       EnforceHTTPS: true
+  #     EncryptionAtRestOptions:
+  #       Enabled: true
+  #     NodeToNodeEncryptionOptions:
+  #       Enabled: true
+  #     AdvancedSecurityOptions:
+  #       Enabled: true
+  #       InternalUserDatabaseEnabled: true
+  #       MasterUserOptions:
+  #         MasterUserName: admin
+  #         MasterUserPassword: !Ref OpenSearchMasterUserPassword
+  #     AccessPolicies:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             AWS:
+  #               - arn:aws:iam::${AWS::AccountId}:root
+  #               - arn:aws:iam::${AWS::AccountId}:role/YourAdminIAMRole
+  #           Action: 'es:ESHttp*'
+  #           Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AWS::StackName}-domain/*'
+      # AccessPolicies:
+      #   Version: '2012-10-17'
+      #   Statement:
+      #     - Effect: Allow
+      #       Principal:
+      #         AWS:
+      #           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${CsvIndexFunction.Role}'
+      #           - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${SearchFunction.Role}'
+      #       Action: 'es:*'
+      #       Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AWS::StackName}-domain/*'
+
+  # CsvIndexFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: src/handlers/index_csv.lambda_handler
+  #     Runtime: python3.13
+  #     MemorySize: 256
+  #     Timeout: 300
+  #     Environment:
+  #       Variables:
+  #         OPENAI_API_KEY: !Ref OpenAIApiKeyParameter
+  #         OPENSEARCH_ENDPOINT: !GetAtt OpenSearchDomain.DomainEndpoint
+  #         OPENSEARCH_INDEX: csv-index
+  #         S3_BUCKET: !Sub '${AWS::StackName}-csv-upload'
+  #     Policies:
+  #       - Statement:
+  #         - Sid: CsvUploadReadOnly
+  #           Effect: Allow
+  #           Action:
+  #             - s3:GetObject
+  #           Resource: !Sub 'arn:aws:s3:::${AWS::StackName}-csv-upload/*'
+  #         - Sid: OpenSearchDomain
+  #           Effect: Allow
+  #           Action:
+  #             - es:ESHttpPost
+  #             - es:ESHttpPut
+  #           Resource: !Sub 'arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/${AWS::StackName}-domain/*'
+  #     Events:
+  #       FileUpload:
+  #         Type: S3
+  #         Properties:
+  #           Bucket: !Ref CsvUploadBucket
+  #           Events: s3:ObjectCreated:*
+
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+Outputs:
+  WebEndpoint:
+    Description: API Gateway endpoint URL for Prod stage
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  # OpenSearchDomainEndpoint:
+  #   Description: URL of your OpenSearch domain
+  #   Value: !GetAtt OpenSearchDomain.DomainEndpoint

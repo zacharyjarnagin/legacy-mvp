@@ -1,0 +1,8 @@
+# test runner
+pytest>=7.0
+
+# mock AWS services
+moto>=4.0
+
+# (optional) pytest plugin for fixtures & better assertions
+pytest-mock>=3.10

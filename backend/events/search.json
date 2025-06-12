@@ -1,0 +1,4 @@
+{
+  "httpMethod": "POST",
+  "body": "{\"query\": \"Can you help me with a patient who has self confidence issues?\", \"openai_api_key\": \"<AWS_SECRET_KEY_GOES_HERE>\"}"
+}
