@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    console.log(data);
     const result = await fetch(
       "https://u6jcmqqbmh.execute-api.us-east-1.amazonaws.com/Prod/",
       {
@@ -13,9 +12,7 @@ export async function POST(request: Request) {
         }),
       }
     );
-    console.log(JSON.stringify(result));
     const jsonResponse = await result.json();
-    console.log(jsonResponse);
     return NextResponse.json(
       { response: jsonResponse.response },
       { status: result.status }
@@ -43,7 +40,6 @@ export async function OPTIONS() {
         method: "OPTIONS",
       }
     );
-    console.log(JSON.stringify(result));
     return NextResponse.json({ response: "" }, { status: result.status });
   } catch (error) {
     console.error(error);
