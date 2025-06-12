@@ -9,7 +9,11 @@ import {
   Loader,
   Textarea,
   Title,
+  Anchor,
+  ThemeIcon,
+  Flex,
 } from "@mantine/core";
+import { IconBrandGithub } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 
@@ -138,6 +142,20 @@ export default function Home() {
             </Grid>
           </Container>
         </Container>
+      </Center>
+      <Center>
+        <Anchor
+          href="https://github.com/zacharyjarnagin/legacy-mvp"
+          target="_blank"
+        >
+          <Flex justify="center" align="center">
+            <Text>View on</Text>
+            <ThemeIcon variant="white">
+              <IconBrandGithub style={{ width: "70%", height: "70%" }} />
+            </ThemeIcon>
+            <Text>GitHub</Text>
+          </Flex>
+        </Anchor>
       </Center>
     </div>
   );
