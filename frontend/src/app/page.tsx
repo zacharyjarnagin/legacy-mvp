@@ -122,7 +122,6 @@ export default function Home() {
                 onChange={handleTextChange}
                 autosize
                 minRows={2}
-                onKeyUp={(event) => console.log(event.code === "Enter")}
               />
             </Grid.Col>
             <Grid.Col>
