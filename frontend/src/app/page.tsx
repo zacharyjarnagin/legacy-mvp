@@ -63,7 +63,7 @@ export default function Home() {
         alignContent: "center",
         justifyContent: "center",
         flexDirection: "column",
-        height: "100vh",
+        marginTop: "12px",
       }}
     >
       <Container size="sm" mb={24}>
