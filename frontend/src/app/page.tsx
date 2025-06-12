@@ -14,7 +14,7 @@ import {
   Flex,
 } from "@mantine/core";
 import { IconBrandGithub } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Markdown from "react-markdown";
 
 const MAX_CHARS = 300;
@@ -25,7 +25,7 @@ export default function Home() {
   const [modelResponse, setModelResponse] = useState("");
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
-  const handleTextChange = (event: any) => {
+  const handleTextChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const newInput = event.currentTarget.value;
     if (newInput.length <= MAX_CHARS) setUserInput(newInput);
   };
